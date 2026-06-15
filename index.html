@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🌏 Dịch & Học Giao Tiếp AI</title>
+<style>
+:root {
+  --primary: #6366F1;
+  --primary-dark: #4F46E5;
+  --secondary: #10B981;
+  --danger: #EF4444;
+  --gray-50: #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-500: #6B7280;
+  --gray-700: #374151;
+  --gray-900: #111827;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #F0F4FF; min-height: 100vh; color: var(--gray-900);
+}
+
+/* SETUP */
+.setup { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.setup-card {
+  background: white; border-radius: 20px; padding: 32px 28px; max-width: 420px; width: 100%;
+  box-shadow: 0 8px 32px rgba(99,102,241,0.15); text-align: center;
+}
+.setup-card .icon { font-size: 52px; margin-bottom: 14px; }
+.setup-card h1 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+.setup-card p { font-size: 13px; color: var(--gray-500); margin-bottom: 24px; line-height: 1.6; }
+.setup-input { position: relative; margin-bottom: 10px; }
+.setup-input input {
+  width: 100%; padding: 12px 44px 12px 14px; border: 1.5px solid var(--gray-200);
+  border-radius: 10px; font-size: 13px; outline: none; background: var(--gray-50);
+}
+.setup-input input:focus { border-color: var(--primary); background: white; }
+.eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 16px; }
+.setup-hint { background: var(--gray-50); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--gray-500); text-align: left; line-height: 1.7; margin-bottom: 18px; }
+.setup-hint a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.btn-start { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
+.btn-start:hover { background: var(--primary-dark); }
+
+/* APP */
+.app { display: none; height: 100vh; flex-direction: column; overflow: hidden; }
+
+/* HEADER */
+.header { background: var(--primary); color: white; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.header h1 { font-size: 15px; font-weight: 700; }
+.header-btn { background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 8px; padding: 5px 10px; font-size: 11px; cursor: pointer; }
+
+/* TABS */
+.tabs { display: flex; background: white; border-bottom: 2px solid var(--gray-200); flex-shrink: 0; }
+.tab-btn { flex: 1; padding: 10px 6px; border: none; background: transparent; font-size: 11px; font-weight: 600; color: var(--gray-500); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+/* CONTENT */
+.content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.tab-panel { display: none; flex: 1; flex-direction: column; }
+.tab-panel.active { display: flex; }
+.scroll-panel { flex: 1; overflow-y: auto; padding: 12px 14px; }
+
+/* LANG BAR */
+.lang-bar { display: flex; align-items: center; gap: 8px; background: white; border-radius: 10px; padding: 10px 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 10px; flex-shrink: 0; }
+.lang-select { flex: 1; border: 1.5px solid var(--gray-200); border-radius: 8px; padding: 7px 8px; font-size: 12px; font-weight: 600; outline: none; background: var(--gray-50); cursor: pointer; }
+.swap-btn { background: var(--primary); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 14px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+
+/* SPEAKER PANEL */
+.speaker-panel { background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 10px; overflow: hidden; flex-shrink: 0; }
+.speaker-toggle { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--gray-700); }
+.speaker-toggle:hover { background: var(--gray-50); }
+.speaker-body { padding: 0 14px 12px; display: none; }
+.speaker-body.open { display: block; }
+.speaker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.speaker-row { display: flex; align-items: center; gap: 8px; }
+.color-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.speaker-name-input { flex: 1; border: 1.5px solid var(--gray-200); border-radius: 7px; padding: 6px 8px; font-size: 12px; font-weight: 600; outline: none; }
+.speaker-name-input:focus { border-color: var(--primary); }
+.gap-row { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--gray-500); }
+.gap-select { border: 1.5px solid var(--gray-200); border-radius: 7px; padding: 5px 8px; font-size: 12px; outline: none; flex: 1; }
+
+/* CONVERSATION AREA */
+.conv-wrap { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+.conv-area { flex: 1; overflow-y: auto; padding: 0 0 8px; display: flex; flex-direction: column; gap: 10px; }
+.empty-conv { text-align: center; padding: 40px 20px; color: var(--gray-500); font-size: 14px; line-height: 1.8; }
+
+/* BUBBLE */
+.bubble { background: white; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); padding: 12px 14px; border-left: 4px solid; }
+.bubble-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.bubble-speaker { font-size: 11px; font-weight: 700; color: white; padding: 3px 10px; border-radius: 999px; }
+.bubble-time { font-size: 11px; color: var(--gray-500); }
+.bubble-original { font-size: 15px; color: var(--gray-900); line-height: 1.5; margin-bottom: 6px; }
+.bubble-divider { height: 1px; background: var(--gray-100); margin: 6px 0; }
+.bubble-translated { font-size: 14px; color: var(--primary); font-weight: 600; line-height: 1.5; min-height: 20px; }
+.bubble-translated.loading { color: var(--gray-500); font-weight: 400; font-size: 13px; }
+.bubble-actions { display: flex; gap: 6px; margin-top: 8px; }
+
+/* INTERIM */
+.interim-wrap { background: #FAFAFA; border-radius: 10px; border: 1.5px dashed var(--gray-200); padding: 10px 14px; margin-bottom: 8px; display: none; flex-shrink: 0; }
+.interim-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.interim-badge { font-size: 11px; font-weight: 700; color: white; padding: 2px 8px; border-radius: 999px; }
+.interim-label { font-size: 11px; color: var(--gray-500); }
+.interim-text { font-size: 15px; color: var(--gray-700); line-height: 1.5; }
+
+/* CONTROLS */
+.ctrl-wrap { padding: 10px 14px 14px; background: white; border-top: 1px solid var(--gray-200); flex-shrink: 0; }
+.ctrl-bar { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 6px; }
+.ctrl-btn { width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid var(--gray-200); background: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.ctrl-btn:hover { background: var(--gray-100); }
+.ctrl-btn.next-btn { border-color: var(--primary); color: var(--primary); }
+.mic-btn-main { width: 62px; height: 62px; border-radius: 50%; background: var(--primary); color: white; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 4px 14px rgba(99,102,241,0.4); display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.mic-btn-main.recording { background: var(--danger); animation: pulse 1s infinite; box-shadow: 0 4px 14px rgba(239,68,68,0.4); }
+@keyframes pulse { 0%,100%{transform:scale(1)}50%{transform:scale(1.07)} }
+.status-text { font-size: 12px; font-weight: 600; color: var(--primary); text-align: center; min-height: 18px; }
+.current-speaker-bar { display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 6px; font-size: 12px; color: var(--gray-500); }
+.current-speaker-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* SHARED: filter btn, phrase, lesson */
+.filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scrollbar-width: none; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-btn { padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--gray-200); background: white; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; color: var(--gray-700); }
+.filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.phrase-lang-select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--gray-200); border-radius: 10px; font-size: 13px; font-weight: 600; outline: none; background: white; margin-bottom: 10px; cursor: pointer; }
+.phrase-card { background: white; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); padding: 12px; margin-bottom: 10px; }
+.phrase-vi { font-size: 13px; font-weight: 600; color: var(--gray-900); margin-bottom: 3px; }
+.phrase-translated { font-size: 13px; color: var(--primary); font-weight: 600; margin-bottom: 2px; }
+.phrase-phonetic { font-size: 11px; color: var(--gray-500); margin-bottom: 7px; }
+.phrase-actions { display: flex; gap: 6px; }
+.phrase-btn { padding: 5px 11px; border-radius: 20px; border: 1.5px solid var(--gray-200); background: white; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--gray-700); }
+.phrase-btn.speak { background: #EEF2FF; border-color: var(--primary); color: var(--primary); }
+.phrase-btn:disabled { opacity: 0.4; cursor: default; }
+.phrase-tag { display: inline-block; padding: 2px 7px; border-radius: 999px; background: var(--gray-100); font-size: 10px; color: var(--gray-500); margin-bottom: 7px; font-weight: 600; }
+.lesson-card { background: white; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); padding: 13px; margin-bottom: 10px; }
+.lesson-en { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+.lesson-phonetic { font-size: 11px; color: #F59E0B; margin-bottom: 3px; font-style: italic; }
+.lesson-vi { font-size: 12px; color: var(--gray-700); margin-bottom: 7px; }
+.lesson-example { font-size: 11px; color: var(--gray-500); background: var(--gray-50); padding: 7px 9px; border-radius: 6px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--gray-900); color: white; padding: 9px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; opacity: 0; transition: all 0.2s; pointer-events: none; z-index: 999; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div class="setup" id="setup">
+  <div class="setup-card">
+    <div class="icon">🌏</div>
+    <h1>Dịch & Học Giao Tiếp AI</h1>
+    <p>Dịch real-time, nhận diện từng người nói<br>+ học tiếng Anh giao tiếp du lịch & đời thường</p>
+    <div class="setup-input">
+      <input type="password" id="key-input" placeholder="Dán Gemini API key vào đây...">
+      <button class="eye-btn" onclick="toggleKey()">👁️</button>
+    </div>
+    <div class="setup-hint">
+      🔑 Lấy key miễn phí tại <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a><br>
+      → Đăng nhập Google → Get API key → Create API key → Copy<br>
+      🔒 Key chỉ lưu trong phiên dùng, không gửi đi đâu khác
+    </div>
+    <button class="btn-start" onclick="startApp()">🚀 Bắt đầu dùng</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="header">
+    <h1>🌏 Dịch & Học Giao Tiếp AI</h1>
+    <button class="header-btn" onclick="logout()">🔑 Đổi key</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('translate')">🎤 Dịch nhóm</button>
+    <button class="tab-btn" onclick="switchTab('phrasebook')">📖 Mẫu câu</button>
+    <button class="tab-btn" onclick="switchTab('learn')">📚 Học tiếng Anh</button>
+  </div>
+
+  <div class="content">
+
+    <!-- TAB 1: DỊCH NHÓM REAL-TIME -->
+    <div class="tab-panel active" id="tab-translate">
+
+      <!-- Top scrollable config -->
+      <div style="padding:12px 14px 0;flex-shrink:0">
+
+        <!-- Lang bar -->
+        <div class="lang-bar">
+          <select class="lang-select" id="src-lang" onchange="onLangChange()">
+            <option value="vi-VN">🇻🇳 Tiếng Việt</option>
+            <option value="en-US">🇺🇸 Tiếng Anh</option>
+            <option value="zh-CN">🇨🇳 Tiếng Trung</option>
+            <option value="th-TH">🇹🇭 Tiếng Thái</option>
+          </select>
+          <button class="swap-btn" onclick="swapLangs()" title="Đổi chiều">⇄</button>
+          <select class="lang-select" id="tgt-lang">
+            <option value="en">🇺🇸 Tiếng Anh</option>
+            <option value="vi">🇻🇳 Tiếng Việt</option>
+            <option value="zh">🇨🇳 Tiếng Trung</option>
+            <option value="th">🇹🇭 Tiếng Thái</option>
+          </select>
+        </div>
+
+        <!-- Speaker setup -->
+        <div class="speaker-panel">
+          <div class="speaker-toggle" onclick="toggleSpeakerPanel()">
+            <span>👥 Cài đặt người nói</span>
+            <span id="sp-toggle-icon">▼</span>
+          </div>
+          <div class="speaker-body" id="speaker-body">
+            <div class="speaker-grid" id="speaker-grid"></div>
+            <div class="gap-row">
+              <span>⏱️ Im lặng → đổi người:</span>
+              <select class="gap-select" id="gap-select" onchange="silenceGap = parseInt(this.value)">
+                <option value="1000">1 giây</option>
+                <option value="1500">1.5 giây</option>
+                <option value="2000" selected>2 giây</option>
+                <option value="3000">3 giây</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Conversation -->
+      <div class="conv-wrap" style="padding:0 14px;min-height:0;flex:1;display:flex;flex-direction:column">
+        <div class="conv-area" id="conv-area">
+          <div class="empty-conv">
+            🎤 Nhấn micro bên dưới để bắt đầu<br>
+            <small>App tự nhận diện khi người khác nói<br>dựa theo khoảng ngừng giữa các câu</small>
+          </div>
+        </div>
+
+        <!-- Current interim -->
+        <div class="interim-wrap" id="interim-wrap">
+          <div class="interim-header">
+            <span class="interim-badge" id="interim-badge">Người 1</span>
+            <span class="interim-label">đang nói...</span>
+          </div>
+          <div class="interim-text" id="interim-text"></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="ctrl-wrap">
+        <div class="current-speaker-bar" id="cur-speaker-bar">
+          <div class="current-speaker-dot" id="cur-dot"></div>
+          <span id="cur-speaker-label">Người 1 sẽ nói tiếp</span>
+        </div>
+        <div class="ctrl-bar">
+          <button class="ctrl-btn" onclick="clearConversation()" title="Xóa hết">🗑️</button>
+          <button class="mic-btn-main" id="mic-btn" onclick="toggleMic()">🎤</button>
+          <button class="ctrl-btn next-btn" onclick="manualNextSpeaker()" title="Người tiếp theo">👤⇒</button>
+        </div>
+        <div class="status-text" id="status-text"></div>
+      </div>
+    </div>
+
+    <!-- TAB 2: PHRASEBOOK -->
+    <div class="tab-panel" id="tab-phrasebook">
+      <div class="scroll-panel">
+        <select class="phrase-lang-select" id="phrase-lang" onchange="renderPhrases()">
+          <option value="en">🇺🇸 Tiếng Anh</option>
+          <option value="zh">🇨🇳 Tiếng Trung</option>
+          <option value="th">🇹🇭 Tiếng Thái</option>
+        </select>
+        <div class="filter-row" id="phrase-filter"></div>
+        <div id="phrase-list"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: HỌC TIẾNG ANH -->
+    <div class="tab-panel" id="tab-learn">
+      <div class="scroll-panel">
+        <div class="filter-row" id="learn-filter"></div>
+        <div id="lesson-list"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== GLOBAL STATE ==========
+let API_KEY = '';
+let recognition = null;
+let isRecording = false;
+
+// Speaker system
+const SPEAKER_DEFS = [
+  { name: 'Người 1', color: '#6366F1', bg: '#EEF2FF' },
+  { name: 'Người 2', color: '#10B981', bg: '#ECFDF5' },
+  { name: 'Người 3', color: '#F59E0B', bg: '#FFFBEB' },
+  { name: 'Người 4', color: '#EF4444', bg: '#FEF2F2' },
+];
+let speakers = SPEAKER_DEFS.map(s => ({...s}));
+let currentSpeakerIdx = 0;
+let silenceGap = 2000;
+let lastFinalTime = 0;
+let currentTurnText = '';
+let interimBuffer = '';
+let silenceTimer = null;
+let bubbleId = 0;
+let spPanelOpen = false;
+
+const langNames = { vi: 'Tiếng Việt', en: 'Tiếng Anh', zh: 'Tiếng Trung', th: 'Tiếng Thái' };
+const ttsLangs  = { vi: 'vi-VN', en: 'en-US', zh: 'zh-CN', th: 'th-TH' };
+
+// ========== SETUP ==========
+function toggleKey() {
+  const i = document.getElementById('key-input');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+function startApp() {
+  const key = document.getElementById('key-input').value.trim();
+  if (!key) { showToast('⚠️ Vui lòng nhập API key'); return; }
+  API_KEY = key;
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  buildSpeakerGrid();
+  updateCurrentSpeakerBar();
+  initSpeechRecognition();
+  renderPhrases();
+  renderLessons();
+}
+function logout() {
+  API_KEY = '';
+  document.getElementById('key-input').value = '';
+  document.getElementById('setup').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  if (isRecording) stopMic();
+}
+document.getElementById('key-input').addEventListener('keydown', e => { if (e.key === 'Enter') startApp(); });
+
+// ========== TABS ==========
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ========== SPEAKER SETUP ==========
+function buildSpeakerGrid() {
+  document.getElementById('speaker-grid').innerHTML = speakers.map((sp, i) =>
+    `<div class="speaker-row">
+      <div class="color-dot" style="background:${sp.color}"></div>
+      <input class="speaker-name-input" value="${sp.name}" oninput="updateSpeakerName(${i}, this.value)">
+    </div>`
+  ).join('');
+}
+function updateSpeakerName(idx, val) {
+  speakers[idx].name = val || `Người ${idx+1}`;
+  updateCurrentSpeakerBar();
+  updateInterimBadge();
+}
+function toggleSpeakerPanel() {
+  spPanelOpen = !spPanelOpen;
+  document.getElementById('speaker-body').classList.toggle('open', spPanelOpen);
+  document.getElementById('sp-toggle-icon').textContent = spPanelOpen ? '▲' : '▼';
+}
+function getSpeaker(idx) { return speakers[idx % speakers.length]; }
+function updateCurrentSpeakerBar() {
+  const sp = getSpeaker(currentSpeakerIdx);
+  document.getElementById('cur-dot').style.background = sp.color;
+  document.getElementById('cur-speaker-label').textContent = `${sp.name} sẽ nói tiếp`;
+}
+
+// ========== SPEECH RECOGNITION ==========
+function initSpeechRecognition() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    document.getElementById('status-text').textContent = '⚠️ Dùng Chrome để dùng được micro';
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = document.getElementById('src-lang').value;
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    document.getElementById('status-text').textContent = '🔴 Đang nghe...';
+    document.getElementById('mic-btn').classList.add('recording');
+    document.getElementById('mic-btn').textContent = '⏹';
+  };
+  recognition.onend = () => {
+    if (isRecording) { try { recognition.start(); } catch(e) {} }
+  };
+  recognition.onerror = (e) => {
+    if (e.error !== 'no-speech') {
+      document.getElementById('status-text').textContent = '⚠️ Lỗi: ' + e.error;
+      stopMic();
+    }
+  };
+  recognition.onresult = (e) => {
+    let interim = '';
+    let final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    if (final) onFinalResult(final);
+    if (interim) onInterimResult(interim);
+  };
+}
+
+function onFinalResult(text) {
+  const now = Date.now();
+  // If gap > threshold AND we have accumulated text → new speaker
+  if (lastFinalTime > 0 && (now - lastFinalTime) > silenceGap && currentTurnText.trim()) {
+    commitTurn();
+    advanceSpeaker();
+  }
+  currentTurnText += (currentTurnText ? ' ' : '') + text.trim();
+  interimBuffer = '';
+  lastFinalTime = now;
+  showInterim(currentTurnText, false);
+
+  // Auto-commit after silence
+  clearTimeout(silenceTimer);
+  silenceTimer = setTimeout(() => {
+    if (currentTurnText.trim()) {
+      commitTurn();
+    }
+  }, silenceGap);
+}
+
+function onInterimResult(text) {
+  interimBuffer = text;
+  showInterim(currentTurnText + (currentTurnText ? ' ' : '') + text, true);
+}
+
+function showInterim(text, isInterim) {
+  const sp = getSpeaker(currentSpeakerIdx);
+  const wrap = document.getElementById('interim-wrap');
+  const badge = document.getElementById('interim-badge');
+  const el = document.getElementById('interim-text');
+  if (!text) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  badge.textContent = sp.name;
+  badge.style.background = sp.color;
+  el.textContent = text;
+  el.style.opacity = isInterim ? '0.65' : '1';
+}
+function updateInterimBadge() {
+  const sp = getSpeaker(currentSpeakerIdx);
+  const badge = document.getElementById('interim-badge');
+  if (badge) { badge.textContent = sp.name; badge.style.background = sp.color; }
+}
+
+function commitTurn() {
+  const text = currentTurnText.trim();
+  if (!text) return;
+  const sp = getSpeaker(currentSpeakerIdx);
+  currentTurnText = '';
+  interimBuffer = '';
+  showInterim('', false);
+  addBubble(sp, text);
+}
+
+function advanceSpeaker() {
+  currentSpeakerIdx = (currentSpeakerIdx + 1) % speakers.length;
+  updateCurrentSpeakerBar();
+  updateInterimBadge();
+}
+
+function toggleMic() {
+  if (isRecording) stopMic(); else startMic();
+}
+function startMic() {
+  if (!recognition) initSpeechRecognition();
+  isRecording = true;
+  recognition.lang = document.getElementById('src-lang').value;
+  try { recognition.start(); } catch(e) {}
+}
+function stopMic() {
+  isRecording = false;
+  clearTimeout(silenceTimer);
+  if (currentTurnText.trim()) commitTurn();
+  if (recognition) try { recognition.stop(); } catch(e) {}
+  document.getElementById('mic-btn').classList.remove('recording');
+  document.getElementById('mic-btn').textContent = '🎤';
+  document.getElementById('status-text').textContent = '';
+}
+
+function manualNextSpeaker() {
+  clearTimeout(silenceTimer);
+  if (currentTurnText.trim()) commitTurn();
+  advanceSpeaker();
+  showToast(`➡️ Chuyển sang ${getSpeaker(currentSpeakerIdx).name}`);
+}
+
+function clearConversation() {
+  clearTimeout(silenceTimer);
+  currentTurnText = '';
+  interimBuffer = '';
+  lastFinalTime = 0;
+  currentSpeakerIdx = 0;
+  showInterim('', false);
+  updateCurrentSpeakerBar();
+  document.getElementById('conv-area').innerHTML =
+    `<div class="empty-conv">🎤 Nhấn micro bên dưới để bắt đầu<br><small>App tự nhận diện khi người khác nói<br>dựa theo khoảng ngừng giữa các câu</small></div>`;
+}
+
+// ========== BUBBLE ==========
+function addBubble(speaker, originalText) {
+  const id = 'b' + (++bubbleId);
+  const conv = document.getElementById('conv-area');
+  const empty = conv.querySelector('.empty-conv');
+  if (empty) empty.remove();
+
+  const time = new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
+  const div = document.createElement('div');
+  div.className = 'bubble';
+  div.id = id;
+  div.style.borderLeftColor = speaker.color;
+  div.innerHTML = `
+    <div class="bubble-header">
+      <span class="bubble-speaker" style="background:${speaker.color}">${speaker.name}</span>
+      <span class="bubble-time">${time}</span>
+    </div>
+    <div class="bubble-original">${escHtml(originalText)}</div>
+    <div class="bubble-divider"></div>
+    <div class="bubble-translated loading" id="${id}-tr">⏳ Đang dịch...</div>
+    <div class="bubble-actions">
+      <button class="phrase-btn speak" id="${id}-tts" onclick="speakBubble('${id}')" disabled>🔊 Phát âm</button>
+      <button class="phrase-btn" onclick="copyBubble('${id}')">📋 Copy</button>
+    </div>`;
+  conv.appendChild(div);
+  conv.scrollTop = conv.scrollHeight;
+
+  const tgt = document.getElementById('tgt-lang').value;
+  callGemini(`Dịch sang ${langNames[tgt]}. Chỉ trả về bản dịch, không giải thích:\n${originalText}`)
+    .then(t => {
+      const el = document.getElementById(id + '-tr');
+      if (!el) return;
+      el.textContent = t;
+      el.classList.remove('loading');
+      el.dataset.text = t;
+      el.dataset.lang = tgt;
+      const btn = document.getElementById(id + '-tts');
+      if (btn) btn.disabled = false;
+    })
+    .catch(() => {
+      const el = document.getElementById(id + '-tr');
+      if (el) { el.textContent = '❌ Lỗi dịch'; el.classList.remove('loading'); }
+    });
+}
+
+function speakBubble(id) {
+  const el = document.getElementById(id + '-tr');
+  if (!el || !el.dataset.text) return;
+  const u = new SpeechSynthesisUtterance(el.dataset.text);
+  u.lang = ttsLangs[el.dataset.lang] || 'en-US';
+  u.rate = 0.85;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  showToast('🔊 Đang phát âm...');
+}
+
+function copyBubble(id) {
+  const orig = document.querySelector('#' + id + ' .bubble-original').textContent;
+  const tr = document.getElementById(id + '-tr').textContent;
+  navigator.clipboard.writeText(orig + '\n→ ' + tr).then(() => showToast('✅ Đã copy!'));
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ========== LANG ==========
+function onLangChange() { if (recognition) { recognition.lang = document.getElementById('src-lang').value; } }
+function swapLangs() {
+  const src = document.getElementById('src-lang');
+  const tgt = document.getElementById('tgt-lang');
+  const srcMap = { en: 'en-US', vi: 'vi-VN', zh: 'zh-CN', th: 'th-TH' };
+  const tgtMap = { 'en-US': 'en', 'vi-VN': 'vi', 'zh-CN': 'zh', 'th-TH': 'th' };
+  const old = tgt.value;
+  tgt.value = tgtMap[src.value] || 'vi';
+  src.value = srcMap[old] || 'vi-VN';
+  onLangChange();
+}
+
+// ========== GEMINI ==========
+async function callGemini(prompt) {
+  const models = [
+    'v1beta/models/gemini-2.0-flash',
+    'v1beta/models/gemini-2.0-flash-lite',
+    'v1beta/models/gemini-2.5-flash',
+    'v1/models/gemini-1.5-flash',
+  ];
+  for (const m of models) {
+    const url = `https://generativelanguage.googleapis.com/${m}:generateContent?key=${API_KEY}`;
+    try {
+      const resp = await fetch(url, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+      });
+      if (resp.ok) {
+        const d = await resp.json();
+        return d.candidates[0].content.parts[0].text.trim();
+      }
+    } catch(e) {}
+  }
+  throw new Error('Lỗi kết nối Gemini');
+}
+
+// ========== PHRASEBOOK ==========
+const phrases = [
+  { vi:'Xin chào! Bạn có khỏe không?', en:'Hello! How are you?', en_p:'/həˈloʊ haʊ ɑːr juː/', zh:'你好！你还好吗？', zh_p:'Nǐ hǎo! Nǐ hái hǎo ma?', th:'สวัสดี! เป็นยังไงบ้าง?', th_p:'Sà-wàt-dii! Bpen yang-ngai baang?', cat:'Chào hỏi' },
+  { vi:'Tôi tên là..., rất vui được gặp bạn', en:'My name is... Nice to meet you!', en_p:'/maɪ neɪm ɪz ... naɪs tə miːt juː/', zh:'我叫...，很高兴认识你', zh_p:'Wǒ jiào..., hěn gāoxìng rènshi nǐ', th:'ฉันชื่อ... ยินดีที่ได้รู้จัก', th_p:'Chăn chûe... yin-dii thîi dâi rúu-jàk', cat:'Chào hỏi' },
+  { vi:'Bạn đến từ đâu?', en:'Where are you from?', en_p:'/wɛr ɑːr juː frɒm/', zh:'你从哪里来？', zh_p:'Nǐ cóng nǎlǐ lái?', th:'คุณมาจากไหน', th_p:'Khun maa jaak nǎi', cat:'Chào hỏi' },
+  { vi:'Tôi đến từ Việt Nam', en:'I am from Vietnam', en_p:'/aɪ æm frɒm ˌviɛtˈnɑːm/', zh:'我来自越南', zh_p:'Wǒ lái zì Yuènán', th:'ฉันมาจากเวียดนาม', th_p:'Chăn maa jaak Wîat-naam', cat:'Chào hỏi' },
+  { vi:'Tạm biệt! Hẹn gặp lại!', en:'Goodbye! See you later!', en_p:'/ɡʊdˈbaɪ siː juː ˈleɪtər/', zh:'再见！回头见！', zh_p:'Zàijiàn! Huítóu jiàn!', th:'ลาก่อน! แล้วเจอกันใหม่!', th_p:'Laa-gòn! Láew jer gan mài!', cat:'Chào hỏi' },
+  { vi:'Bạn có thể dạy tôi một từ không?', en:'Can you teach me a word?', en_p:'/kæn juː tiːtʃ miː ə wɜːrd/', zh:'你能教我一个词吗？', zh_p:'Nǐ néng jiāo wǒ yī gè cí ma?', th:'คุณสอนคำๆหนึ่งให้ฉันได้ไหม', th_p:'Khun sŏrn kham-nùeng hâi chăn dâi mái', cat:'Làm quen' },
+  { vi:'Bạn có Facebook / Zalo không?', en:'Do you have Facebook / Instagram?', en_p:'/duː juː hæv ˈfeɪsbʊk/', zh:'你有微信吗？', zh_p:'Nǐ yǒu wēixìn ma?', th:'คุณมี Line ไหม', th_p:'Khun mii Line mái', cat:'Làm quen' },
+  { vi:'Chụp ảnh cùng tôi được không?', en:'Can we take a photo together?', en_p:'/kæn wiː teɪk ə ˈfoʊtoʊ təˈɡɛðər/', zh:'我们可以一起拍照吗？', zh_p:'Wǒmen kěyǐ yīqǐ pāizhào ma?', th:'เราถ่ายรูปด้วยกันได้ไหม', th_p:'Rao thàai-rûup dûay-gan dâi mái', cat:'Làm quen' },
+  { vi:'Cho tôi xem thực đơn', en:'Can I see the menu, please?', en_p:'/kæn aɪ siː ðə ˈmenjuː/', zh:'请给我看菜单', zh_p:'Qǐng gěi wǒ kàn càidān', th:'ขอดูเมนูหน่อยได้ไหม', th_p:'Kŏr doo menu noi dâi mái', cat:'Nhà hàng' },
+  { vi:'Tôi ăn chay / dị ứng', en:'I am vegetarian / I have allergies', en_p:'/aɪ æm ˈvedʒɪtɛriən/', zh:'我是素食者 / 我有过敏', zh_p:'Wǒ shì sùshí zhě / wǒ yǒu guòmǐn', th:'ฉันกินมังสวิรัติ / แพ้อาหาร', th_p:'Chăn gin mang-sa-wi-rát / pháe a-hăan', cat:'Nhà hàng' },
+  { vi:'Tính tiền cho tôi', en:'Check, please! / The bill, please!', en_p:'/tʃɛk pliːz/', zh:'买单，谢谢', zh_p:'Mǎidān, xièxiè', th:'เก็บเงินด้วยครับ/ค่ะ', th_p:'Gèp ngern dûay khráp/khâ', cat:'Nhà hàng' },
+  { vi:'Không cay / ít cay', en:'Not spicy / A little spicy', en_p:'/nɒt ˈspaɪsi/', zh:'不辣 / 微辣', zh_p:'Bù là / wēi là', th:'ไม่เผ็ด / เผ็ดน้อย', th_p:'Mâi pèt / pèt nói', cat:'Nhà hàng' },
+  { vi:'Cái này bao nhiêu tiền?', en:'How much does this cost?', en_p:'/haʊ mʌtʃ dʌz ðɪs kɒst/', zh:'这个多少钱？', zh_p:'Zhège duōshǎo qián?', th:'อันนี้ราคาเท่าไหร่', th_p:'An-níi raa-khaa thâo-rài', cat:'Mua sắm' },
+  { vi:'Bớt giá được không?', en:'Can you give me a discount?', en_p:'/kæn juː ɡɪv miː ə ˈdɪskaʊnt/', zh:'可以便宜一点吗？', zh_p:'Kěyǐ piányí yīdiǎn ma?', th:'ลดราคาได้ไหม', th_p:'Lót raa-khaa dâi mái', cat:'Mua sắm' },
+  { vi:'Tôi chỉ xem thôi', en:'I am just looking, thanks', en_p:'/aɪ æm dʒʌst ˈlʊkɪŋ θæŋks/', zh:'我只是看看，谢谢', zh_p:'Wǒ zhǐshì kànkan, xièxiè', th:'ฉันแค่ดูนะคะ ขอบคุณ', th_p:'Chăn khâe doo ná khâ, khòp khun', cat:'Mua sắm' },
+  { vi:'Tôi có đặt phòng tên...', en:'I have a reservation under the name...', en_p:'/aɪ hæv ə ˌrɛzəˈveɪʃən/', zh:'我预订了房间，名字是...', zh_p:'Wǒ yùdìngle fángjiān, míngzì shì...', th:'ฉันจองห้องไว้ในชื่อ...', th_p:'Chăn jorng hông wái nai chûe...', cat:'Khách sạn' },
+  { vi:'Trả phòng lúc mấy giờ?', en:'What time is check-out?', en_p:'/wɒt taɪm ɪz ˈtʃɛkaʊt/', zh:'几点退房？', zh_p:'Jǐ diǎn tuìfáng?', th:'เช็คเอ้าท์กี่โมง', th_p:'Check-out gì mong', cat:'Khách sạn' },
+  { vi:'Đi đến... mất bao lâu?', en:'How long does it take to get to...?', en_p:'/haʊ lɒŋ dʌz ɪt teɪk/', zh:'去...要多长时间？', zh_p:'Qù... yào duō cháng shíjiān?', th:'ไปที่...ใช้เวลานานแค่ไหน', th_p:'Pai thîi... chái we-laa naan khâe nǎi', cat:'Di chuyển' },
+  { vi:'Tôi bị lạc đường', en:'I am lost. Can you help me?', en_p:'/aɪ æm lɒst/', zh:'我迷路了，你能帮我吗？', zh_p:'Wǒ mílù le, nǐ néng bāng wǒ ma?', th:'ฉันหลงทาง ช่วยฉันได้ไหม', th_p:'Chăn lŏng taang, chûay chăn dâi mái', cat:'Di chuyển' },
+  { vi:'Gọi cấp cứu / cảnh sát', en:'Call an ambulance / the police!', en_p:'/kɔːl ən ˈæmbjʊləns/', zh:'叫救护车 / 警察！', zh_p:'Jiào jiùhùchē / jǐngchá!', th:'เรียกรถพยาบาล / ตำรวจ!', th_p:'Rîak rót pá-yaa-baan / tam-rùat!', cat:'Khẩn cấp' },
+  { vi:'Tôi cần bác sĩ', en:'I need a doctor', en_p:'/aɪ niːd ə ˈdɒktər/', zh:'我需要医生', zh_p:'Wǒ xūyào yīshēng', th:'ฉันต้องการหมอ', th_p:'Chăn dtông-gaan mŏr', cat:'Khẩn cấp' },
+  { vi:'Tôi bị mất hộ chiếu', en:'I lost my passport', en_p:'/aɪ lɒst maɪ ˈpɑːspɔːt/', zh:'我的护照丢了', zh_p:'Wǒ de hùzhào diū le', th:'ฉันทำพาสปอร์ตหาย', th_p:'Chăn tam passport hǎai', cat:'Khẩn cấp' },
+];
+const cats = ['Tất cả','Chào hỏi','Làm quen','Nhà hàng','Mua sắm','Khách sạn','Di chuyển','Khẩn cấp'];
+let activeCat = 'Tất cả';
+
+function renderPhrases() {
+  const lang = document.getElementById('phrase-lang').value;
+  document.getElementById('phrase-filter').innerHTML = cats.map(c =>
+    `<button class="filter-btn ${c===activeCat?'active':''}" onclick="setCat('${c}')">${c}</button>`
+  ).join('');
+  const list = activeCat==='Tất cả' ? phrases : phrases.filter(p=>p.cat===activeCat);
+  document.getElementById('phrase-list').innerHTML = list.map(p => {
+    const tr = p[lang]; const ph = p[lang+'_p'];
+    return `<div class="phrase-card">
+      <span class="phrase-tag">${p.cat}</span>
+      <div class="phrase-vi">${p.vi}</div>
+      <div class="phrase-translated">${tr}</div>
+      ${ph?`<div class="phrase-phonetic">${ph}</div>`:''}
+      <div class="phrase-actions">
+        <button class="phrase-btn speak" onclick="speakPhrase('${tr.replace(/'/g,"\\'")}','${ttsLangs[lang]}')">🔊 Phát âm</button>
+        <button class="phrase-btn" onclick="copyPhrase('${tr.replace(/'/g,"\\'")}')">📋 Copy</button>
+      </div></div>`;
+  }).join('');
+}
+function setCat(c) { activeCat=c; renderPhrases(); }
+function speakPhrase(text, lang) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang=lang; u.rate=0.8; speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+function copyPhrase(text) { navigator.clipboard.writeText(text).then(()=>showToast('✅ Đã copy!')); }
+
+// ========== LESSONS ==========
+const lessons = [
+  { en:'Hello! How are you?', p:'/həˈloʊ haʊ ɑːr juː/', vi:'Xin chào! Bạn có khỏe không?', ex:'Câu chào cơ bản nhất, dùng với bất kỳ ai', cat:'Chào hỏi' },
+  { en:'I am fine, thank you! And you?', p:'/aɪ æm faɪn θæŋk juː ænd juː/', vi:'Tôi khỏe, cảm ơn! Còn bạn?', ex:'Câu trả lời lịch sự nhất khi được hỏi thăm', cat:'Chào hỏi' },
+  { en:'Nice to meet you!', p:'/naɪs tə miːt juː/', vi:'Rất vui được gặp bạn!', ex:'Nói khi lần đầu gặp ai đó', cat:'Chào hỏi' },
+  { en:'Thank you very much!', p:'/θæŋk juː ˈvɛri mʌtʃ/', vi:'Cảm ơn rất nhiều!', ex:'Luôn nói kèm nụ cười — được yêu quý khắp nơi!', cat:'Chào hỏi' },
+  { en:"You're welcome!", p:'/jɔːr ˈwɛlkəm/', vi:'Không có gì! / Không sao!', ex:'Trả lời khi người khác cảm ơn bạn', cat:'Chào hỏi' },
+  { en:"I'm sorry!", p:'/aɪm ˈsɒri/', vi:'Tôi xin lỗi!', ex:'Khi vô tình va chạm, làm phiền ai đó', cat:'Chào hỏi' },
+  { en:"I don't understand", p:'/aɪ doʊnt ˌʌndərˈstænd/', vi:'Tôi không hiểu', ex:'Nói thẳng — người bản ngữ sẽ sẵn lòng giải thích lại', cat:'Giao tiếp' },
+  { en:'Can you speak more slowly?', p:'/kæn juː spiːk mɔːr ˈsloʊli/', vi:'Bạn có thể nói chậm hơn không?', ex:'Dùng khi người kia nói quá nhanh', cat:'Giao tiếp' },
+  { en:'Can you repeat that, please?', p:'/kæn juː rɪˈpiːt ðæt pliːz/', vi:'Bạn có thể nhắc lại không?', ex:'Khi không nghe rõ câu vừa nói', cat:'Giao tiếp' },
+  { en:'Can you write it down?', p:'/kæn juː raɪt ɪt daʊn/', vi:'Bạn có thể viết ra không?', ex:'Rất hữu ích khi nghe không ra, nhờ viết để đọc', cat:'Giao tiếp' },
+  { en:'Do you speak Vietnamese?', p:'/duː juː spiːk ˌviɛtˈnɑːmiːz/', vi:'Bạn có nói được tiếng Việt không?', ex:'Hỏi may mắn — đôi khi gặp người biết!', cat:'Giao tiếp' },
+  { en:'My English is not very good', p:'/maɪ ˈɪŋɡlɪʃ ɪz nɒt ˈvɛri ɡʊd/', vi:'Tiếng Anh của tôi không giỏi lắm', ex:'Nói trước để người kia thông cảm và nói chậm hơn', cat:'Giao tiếp' },
+  { en:'Excuse me, where is the bathroom?', p:'/ɪkˈskjuːz miː wɛr ɪz ðə ˈbɑːθruːm/', vi:'Xin lỗi, nhà vệ sinh ở đâu?', ex:'Dùng khi ở nhà hàng, trung tâm thương mại, sân bay', cat:'Du lịch' },
+  { en:'Where is the nearest ATM?', p:'/wɛr ɪz ðə ˈnɪərɪst ˌeɪtiːˈɛm/', vi:'ATM gần nhất ở đâu?', ex:'Hỏi khi cần rút tiền mặt', cat:'Du lịch' },
+  { en:'Could you take a photo for me?', p:'/kʊd juː teɪk ə ˈfoʊtoʊ fər miː/', vi:'Bạn có thể chụp ảnh cho tôi không?', ex:'Nhờ người lạ chụp kỷ niệm — họ thường rất vui', cat:'Du lịch' },
+  { en:'Is this seat taken?', p:'/ɪz ðɪs siːt ˈteɪkən/', vi:'Chỗ này có ai ngồi chưa?', ex:'Hỏi khi muốn ngồi cạnh người khác', cat:'Du lịch' },
+  { en:'Can I pay by card?', p:'/kæn aɪ peɪ baɪ kɑːrd/', vi:'Tôi có thể trả bằng thẻ không?', ex:'Hỏi trước khi mua để tránh phải tìm tiền mặt', cat:'Du lịch' },
+  { en:'How much is this?', p:'/haʊ mʌtʃ ɪz ðɪs/', vi:'Cái này giá bao nhiêu?', ex:'👆 Chỉ vào đồ vật khi nói — rất hiệu quả!', cat:'Du lịch' },
+  { en:'What do you do for work?', p:'/wɒt duː juː duː fər wɜːrk/', vi:'Bạn làm nghề gì?', ex:'Câu hỏi phổ biến khi làm quen, dùng ở mọi tình huống', cat:'Kết bạn' },
+  { en:'I work in HR / recruitment', p:'/aɪ wɜːrk ɪn ˌeɪtʃˈɑːr/', vi:'Tôi làm trong lĩnh vực nhân sự / tuyển dụng', ex:'Thay "HR / recruitment" bằng ngành nghề của bạn', cat:'Kết bạn' },
+  { en:'I am a freelancer', p:'/aɪ æm ə ˈfriːlɑːnsər/', vi:'Tôi làm freelance', ex:'Từ "freelancer" được hiểu ở hầu hết mọi quốc gia', cat:'Kết bạn' },
+  { en:'What is your hobby?', p:'/wɒt ɪz jɔːr ˈhɒbi/', vi:'Sở thích của bạn là gì?', ex:'Câu mở đầu cuộc trò chuyện rất tự nhiên', cat:'Kết bạn' },
+  { en:'I love traveling and meeting new people', p:'/aɪ lʌv ˈtrævəlɪŋ ænd ˈmiːtɪŋ njuː ˈpiːpəl/', vi:'Tôi thích đi du lịch và gặp gỡ người mới', ex:'Chia sẻ về bản thân — tạo kết nối tốt hơn', cat:'Kết bạn' },
+  { en:'Can I add you on social media?', p:'/kæn aɪ æd juː ɒn ˈsoʊʃəl ˈmiːdiə/', vi:'Tôi có thể kết bạn với bạn trên mạng xã hội không?', ex:'Nói khi muốn giữ liên lạc sau khi gặp', cat:'Kết bạn' },
+];
+let activeLearnCat = 'Tất cả';
+const learnCats = ['Tất cả','Chào hỏi','Giao tiếp','Du lịch','Kết bạn'];
+
+function renderLessons() {
+  document.getElementById('learn-filter').innerHTML = learnCats.map(c =>
+    `<button class="filter-btn ${c===activeLearnCat?'active':''}" onclick="setLearnCat('${c}')">${c}</button>`
+  ).join('');
+  const list = activeLearnCat==='Tất cả' ? lessons : lessons.filter(l=>l.cat===activeLearnCat);
+  document.getElementById('lesson-list').innerHTML = list.map(l =>
+    `<div class="lesson-card">
+      <div class="lesson-en">${l.en}</div>
+      <div class="lesson-phonetic">${l.p}</div>
+      <div class="lesson-vi">🇻🇳 ${l.vi}</div>
+      <div class="lesson-example">💡 ${l.ex}</div>
+      <div style="margin-top:8px;display:flex;gap:6px">
+        <button class="phrase-btn speak" onclick="speakPhrase('${l.en.replace(/'/g,"\\'")}','en-US')">🔊 Nghe phát âm</button>
+        <button class="phrase-btn" onclick="copyPhrase('${l.en.replace(/'/g,"\\'")}')">📋 Copy</button>
+      </div></div>`
+  ).join('');
+}
+function setLearnCat(c) { activeLearnCat=c; renderLessons(); }
+
+// ========== TOAST ==========
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>
